@@ -1,0 +1,98 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    18:53:53 08/09/2021 
+-- Design Name: 
+-- Module Name:    FPGAdisplay - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity FPGAdisplay is
+	port(
+		clk : in std_logic;
+		display : out std_logic_vector(6 downto 0)
+	);
+end FPGAdisplay;
+
+architecture Behavioral of FPGAdisplay is
+	component fulCounter 
+		port(
+			clock : in std_logic;
+			yOut : out std_logic_vector(3 downto 0)
+			
+		);
+	end component;
+	
+	
+	component sevenSegment 
+		port(
+			B,C,D,E: in std_logic;
+			Sa,Sb,Sc,Sd,Se,Sf,Sg: out std_logic
+		);
+	end component;
+	
+	component clkDiv
+		port(
+			A_50m : in std_logic;
+			Y_250 : out std_logic
+		);
+	end component;
+	
+	
+	signal yOutSig : std_logic_vector(3 downto 0);
+	signal muxSelSig : std_logic_vector(1 downto 0);
+	signal muxOutSig : std_logic_vector(3 downto 0);
+	signal clkDivSig : std_logic;
+	
+begin
+	Counter : fulCounter port map(
+			clock => clkDivSig, 
+			yOut => yOutSig
+			
+		);
+	sevenseg : sevenSegment port map(
+			
+			B   => yOutSig(3),
+			C   => yOutSig(2),
+			D   => yOutSig(1),
+			E   => yOutSig(0),
+			Sa  => display(6),
+			Sb  => display(5),
+			Sc  => display(4),
+			Sd  => display(3),
+			Se  => display(2),
+			Sf  => display(1),
+			Sg  => display(0)
+		);
+		
+
+		
+	clockDiv :  clkDiv port map(
+			A_50m => clk,
+			Y_250 => clkDivSig
+		);
+
+	
+end Behavioral;
