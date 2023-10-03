@@ -1,0 +1,89 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    21:12:32 07/25/2021 
+-- Design Name: 
+-- Module Name:    fulCounter - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity fulCounter is
+	port(
+		clock : in std_logic;
+--		reset 
+		yOut : out std_logic_vector(3 downto 0)
+		--outBuffer : out std_logic
+	);
+end fulCounter;
+
+
+architecture Behavioral of fulCounter is
+	component controlUnit 
+		port(
+			 outDataFeed : out std_logic;
+			iload, iclear : out std_logic;
+			statusOut : in std_logic;
+			
+			  reset, clock  : in std_logic
+	  );
+	end component;
+	
+	component counterDatapath is
+		port(
+			cout : out std_logic;
+			 outDataFeed,cin : in std_logic;
+			iload, iclear : in std_logic;
+			 statusOut : out std_logic;
+			clock : in std_logic;
+			Y : out std_logic_vector(3 downto 0)
+		);
+	end component;
+	
+	signal BufferIn, iIn, clear,A, resetsig : std_logic;
+
+begin
+	CU : controlUnit port map (
+	      outDataFeed => BufferIn,
+			iload => iIn,
+			iclear => resetsig,
+			clock => clock,
+			statusOut => A,
+			
+			reset => resetsig
+	
+	);
+	
+	Datapath : counterDatapath port map(
+		cin => '0',
+		outDataFeed => BufferIn,
+		iload => iIn,
+		iclear => resetsig,
+		clock => clock,
+		statusOut => A,
+		Y => yOut
+	);
+	
+
+end Behavioral;
