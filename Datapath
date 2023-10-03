@@ -1,0 +1,113 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    06:09:49 07/27/2021 
+-- Design Name: 
+-- Module Name:    counterDatapath - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity counterDatapath is
+	port(
+			cout : out std_logic;
+		 outDataFeed,cin :   in std_logic;
+		iload, iclear :      in std_logic;
+		 statusOut : out std_logic;
+		clock : in std_logic;
+		Y : out std_logic_vector(3 downto 0)
+	);
+end counterDatapath;
+
+architecture Behavioral of counterDatapath is
+	component fourBitFullAdder is
+		port(
+			C0 : in std_logic;
+		  A,B : in std_logic_vector(3 downto 0); 
+			 S : out std_logic_vector(3 downto 0);
+		C_out : out std_logic		 
+		);
+	end component;
+	
+	component notTenComparator 
+		port(
+			A : in std_logic_vector(3 downto 0);
+			Y : out std_logic
+		);
+	end component;
+	
+	component reg 
+		port(
+			iclear, iload : in std_logic;
+			clk : in std_logic;
+			D : in std_logic_vector(3 downto 0);
+			Q : out std_logic_vector(3 downto 0)
+		);
+	end component;
+	
+	component dataOut is 
+		port(
+			A : in std_logic_vector(3 downto 0);
+			OutCtrl : in std_logic;
+			Y : out std_logic_vector(3 downto 0)
+		);
+
+	end component;
+	
+	signal adderOut,regOut : std_logic_vector(3 downto 0);
+	
+
+begin
+	
+	
+	adder : fourBitFullAdder port map(
+			C0 => Cin,
+		    A => "0001",
+		    B => regOut, 
+			 S => adderOut,
+		C_out => cout
+		);
+		
+	notTen : notTenComparator port map(
+			A => adderOut,
+			Y => statusOut
+		);
+	
+	reg_1 : reg port map(
+			iclear => iclear,
+			clk    => clock,
+			iload  => iload,
+			D      => adderOut,
+			Q      => regOut
+		);
+		
+	outputBuffer : dataOut port map(
+			A       => regOut,
+			OutCtrl => outDataFeed,
+			Y       => Y 
+		);
+
+	
+
+end Behavioral;
