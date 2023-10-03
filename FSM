@@ -1,0 +1,105 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    07:07:26 07/27/2021 
+-- Design Name: 
+-- Module Name:    controlUnit - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity controlUnit is
+	port(
+		
+		 outDataFeed  : out std_logic;
+		iload, iclear : out std_logic;
+		statusOut : in std_logic;
+		
+		  reset, clock : in std_logic
+	);
+end controlUnit;
+
+ architecture Behavioral of controlUnit is
+	type states is (ST0, ST1, ST2, ST3);
+	signal PS,NS : states;
+	
+begin
+	ns_ps : process(clock, reset)
+				begin 
+					if(reset = '1') then 
+						PS <= ST0;
+					elsif(rising_Edge(clock)) then
+						PS <= NS;
+					end if;
+			  end process;
+			  
+	ns_compute : process(ps, statusOut) --create a link between the current state, next state and condition
+						begin
+							case(PS) is
+								when ST0 =>
+									if(statusOut = '1') then 
+										NS <= ST1;
+									else
+										NS <= ST3;
+									end if;
+								when ST1 =>
+									NS <= ST2;
+								when ST2 =>
+									if(statusOut = '1') then
+										NS <= ST1;
+									else
+										NS <= ST3;
+									end if;
+								when ST3 =>
+									NS <= ST3;
+						end case;
+					end process;
+					
+	output_logic : process(PS) --create the control word
+							begin
+								case(PS) is
+									when ST0 => 
+										iclear <= '1';
+										iload <= '0';
+										outDataFeed <= '0';
+										
+									when ST1 => 
+										iclear <= '0';
+										iload <= '1';
+										outDataFeed <= '0';
+										
+									when ST2 => 
+										iclear <= '0';
+										iload <= '0';
+										outDataFeed <= '1';
+										
+									when ST3 => 
+										iclear <= '0';
+										iload <= '0';
+										outDataFeed <= '0';
+										
+								end case;
+						end process;
+
+end Behavioral;
