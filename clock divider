@@ -1,0 +1,54 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    04:40:29 08/10/2021 
+-- Design Name: 
+-- Module Name:    clkDiv - Behavioral 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity clkDiv is
+	port(
+		A_50m : in std_logic;
+		Y_250 : out std_logic
+	);
+end clkDiv;
+
+architecture Behavioral of clkDiv is
+
+	signal count_sig : std_logic_vector(25 downto 0) := (others=>'0');
+	
+begin
+	process(A_50m)
+		begin
+			if(rising_edge(A_50m))then 
+				count_sig <= count_sig + 1;
+			end if;
+	end process;
+		
+	Y_250 <= count_sig(25);
+
+end Behavioral;
